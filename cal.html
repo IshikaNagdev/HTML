@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extreme Design Calculator</title>
+  <style>
+    /* General page styles */
+    body {
+      background: radial-gradient(circle, rgba(0, 0, 0, 1) 0%, rgba(255, 0, 85, 1) 50%, rgba(0, 212, 255, 1) 100%);
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* Calculator container */
+    .calculator {
+      width: 350px;
+      background: linear-gradient(135deg, #ff0080, #00c6ff);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .calculator:hover {
+      transform: scale(1.05);
+      box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .calculator .display {
+      width: 100%;
+      height: 60px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 28px;
+      text-align: right;
+      padding: 15px;
+      border-radius: 10px;
+      box-sizing: border-box;
+      margin-bottom: 30px;
+      border: 2px solid #fff;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s ease;
+    }
+
+    .display:focus {
+      outline: none;
+      border-color: #00ff00;
+      box-shadow: 0 0 8px 4px rgba(0, 255, 0, 0.8);
+    }
+
+    /* Button grid styles */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      justify-items: center;
+    }
+
+    .buttons button {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #ff0080, #00c6ff);
+      color: #fff;
+      border: none;
+      border-radius: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .buttons button:hover {
+      transform: scale(1.1);
+      box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(135deg, #00c6ff, #ff0080);
+    }
+
+    .buttons button:active {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #ff0080, #00c6ff);
+      box-shadow: none;
+    }
+
+    .buttons button.operator {
+      background-color: #ff6f61;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .buttons button.operator:hover {
+      background-color: #ff5031;
+    }
+
+    .buttons button.clear {
+      background-color: #ff4444;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .buttons button.clear:hover {
+      background-color: #ff2a2a;
+    }
+
+    .buttons button.equals {
+      background-color: #29b6f6;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .buttons button.equals:hover {
+      background-color: #00bcd4;
+    }
+
+    /* Animations for buttons */
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 12px rgba(0, 255, 0, 0.5);
+      }
+      50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(0, 255, 0, 1);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 12px rgba(0, 255, 0, 0.5);
+      }
+    }
+
+    .buttons button.pulse-animation:hover {
+      animation: pulse 0.8s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <input type="text" class="display" id="display" disabled />
+
+    <div class="buttons">
+      <button class="clear pulse-animation" onclick="clearDisplay()">C</button>
+      <button onclick="appendToDisplay('7')">7</button>
+      <button onclick="appendToDisplay('8')">8</button>
+      <button onclick="appendToDisplay('9')">9</button>
+      <button class="operator" onclick="appendToDisplay('+')">+</button>
+
+      <button onclick="appendToDisplay('4')">4</button>
+      <button onclick="appendToDisplay('5')">5</button>
+      <button onclick="appendToDisplay('6')">6</button>
+      <button class="operator" onclick="appendToDisplay('-')">-</button>
+
+      <button onclick="appendToDisplay('1')">1</button>
+      <button onclick="appendToDisplay('2')">2</button>
+      <button onclick="appendToDisplay('3')">3</button>
+      <button class="operator" onclick="appendToDisplay('*')">*</button>
+
+      <button onclick="appendToDisplay('0')">0</button>
+      <button onclick="appendToDisplay('.')">.</button>
+      <button class="equals" onclick="calculateResult()">=</button>
+      <button class="operator" onclick="appendToDisplay('/')">/</button>
+    </div>
+  </div>
+
+  <script>
+    function clearDisplay() {
+      document.getElementById('display').value = '';
+    }
+
+    function appendToDisplay(value) {
+      document.getElementById('display').value += value;
+    }
+
+    function calculateResult() {
+      let display = document.getElementById('display');
+      try {
+        display.value = eval(display.value);
+      } catch (e) {
+        display.value = 'Error';
+      }
+    }
+  </script>
+</body>
+</html>
