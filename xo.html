@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌌 Ultimate 7D Tic Tac Toe with Players 🌠</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: radial-gradient(circle at center, #0f0022 0%, #010010 100%);
+      overflow-x: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 4em;
+      margin: 20px;
+      color: #00ffe7;
+      text-shadow: 0 0 20px #00ffe7, 0 0 40px #00c9ff, 0 0 60px #00ffe7;
+      animation: pulse 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { text-shadow: 0 0 20px #00ffe7, 0 0 40px #00c9ff, 0 0 60px #00ffe7; }
+      50% { text-shadow: 0 0 40px #00ffe7, 0 0 80px #00c9ff, 0 0 100px #00ffe7; }
+    }
+
+    .input-names {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .input-names input {
+      font-size: 1.2em;
+      padding: 10px;
+      margin: 0 10px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      background: #330066;
+      color: #fff;
+      box-shadow: 0 0 10px #ff00ff;
+    }
+
+    .start-btn {
+      padding: 10px 30px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(90deg, #00ffff, #0088ff);
+      color: #000;
+      font-weight: bold;
+      margin-top: 20px;
+      cursor: pointer;
+      box-shadow: 0 0 20px #00ffff;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 40px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 120px);
+      grid-template-rows: repeat(3, 120px);
+      gap: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 30px;
+      border-radius: 40px;
+      box-shadow: inset 0 0 50px #00ffee55, 0 0 60px #0099ff55;
+      transform: rotateX(25deg) rotateY(10deg);
+    }
+
+    .cell {
+      background: linear-gradient(145deg, #110033, #330066);
+      border: none;
+      font-size: 3em;
+      font-weight: bold;
+      color: #ffffff;
+      border-radius: 25px;
+      box-shadow: 0 0 15px #ff00ff, 0 0 25px #8a2be2;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .cell:hover {
+      transform: scale(1.15) rotateY(10deg);
+      box-shadow: 0 0 30px #ff00ff, 0 0 40px #8a2be2;
+    }
+
+    .status {
+      text-align: center;
+      font-size: 2em;
+      margin-top: 30px;
+      color: #ffffff;
+      text-shadow: 0 0 20px #fff, 0 0 30px #00ffe7;
+    }
+
+    .win {
+      color: #ffeb3b;
+      font-size: 2.5em;
+      text-shadow: 0 0 30px #ffeb3b, 0 0 60px #ffff00;
+    }
+
+    .button {
+      display: block;
+      margin: 30px auto;
+      padding: 15px 40px;
+      background: linear-gradient(90deg, #ff00c8, #ff7ef3);
+      border: none;
+      color: white;
+      font-size: 1.2em;
+      font-weight: bold;
+      border-radius: 30px;
+      box-shadow: 0 0 25px #ff00c8, 0 0 45px #ff00c8;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .button:hover {
+      background: linear-gradient(90deg, #ff00ff, #ff99e0);
+      transform: scale(1.05);
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: hsl(var(--hue), 100%, 50%);
+      border-radius: 50%;
+      animation: confetti-fall 2s ease-out forwards;
+      z-index: 100;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(0) rotate(0); opacity: 1; }
+      100% { transform: translateY(800px) rotate(720deg); opacity: 0; }
+    }
+
+    .turn-indicator {
+      text-align: center;
+      font-size: 1.6em;
+      margin-top: 10px;
+      color: #00ffe7;
+      text-shadow: 0 0 10px #00c9ff;
+      animation: flicker 2s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 Ultimate 7D Tic Tac Toe 🌌</h1>
+  <div class="input-names">
+    <input id="playerX" placeholder="Player X Name" />
+    <input id="playerO" placeholder="Player O Name" />
+    <button class="start-btn" onclick="startGame()">Start Game</button>
+  </div>
+  <div class="container">
+    <div class="board" id="board"></div>
+  </div>
+  <div class="turn-indicator" id="turnIndicator"></div>
+  <div class="status" id="status"></div>
+  <button class="button" onclick="resetGame()">Play Again</button>
+
+  <script>
+    let board = Array(9).fill(null);
+    let xIsNext = true;
+    let winner = null;
+    let winningCombination = [];
+    let playerX = 'X';
+    let playerO = 'O';
+
+    const boardElement = document.getElementById('board');
+    const statusElement = document.getElementById('status');
+    const turnIndicator = document.getElementById('turnIndicator');
+
+    function startGame() {
+      const x = document.getElementById('playerX').value.trim();
+      const o = document.getElementById('playerO').value.trim();
+      if (x) playerX = x;
+      if (o) playerO = o;
+      resetGame();
+    }
+
+    function createBoard() {
+      boardElement.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('button');
+        cell.classList.add('cell');
+        cell.dataset.index = i;
+        cell.onclick = () => handleClick(i);
+        boardElement.appendChild(cell);
+      }
+      updateTurnIndicator();
+    }
+
+    function handleClick(index) {
+      if (board[index] || winner) return;
+      board[index] = xIsNext ? 'X' : 'O';
+      updateBoard();
+      checkWinner();
+      if (!winner) xIsNext = !xIsNext;
+      updateTurnIndicator();
+    }
+
+    function updateBoard() {
+      const cells = document.querySelectorAll('.cell');
+      cells.forEach((cell, i) => {
+        cell.textContent = board[i];
+        if (winningCombination.includes(i)) {
+          cell.style.background = 'linear-gradient(145deg, #fff200, #ffe600)';
+          cell.style.color = '#000';
+          cell.style.boxShadow = '0 0 30px #fff200, 0 0 60px #ff0';
+        } else {
+          cell.style.background = '';
+          cell.style.color = '';
+          cell.style.boxShadow = '';
+        }
+      });
+    }
+
+    function checkWinner() {
+      const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (const pattern of winPatterns) {
+        const [a,b,c] = pattern;
+        if (board[a] && board[a] === board[b] && board[b] === board[c]) {
+          winner = board[a];
+          winningCombination = pattern;
+          showWinner();
+          popConfetti();
+          updateBoard();
+          return;
+        }
+      }
+      if (!board.includes(null) && !winner) {
+        statusElement.innerHTML = '<span class="win">It\'s a Draw!</span>';
+      }
+    }
+
+    function showWinner() {
+      const name = winner === 'X' ? playerX : playerO;
+      statusElement.innerHTML = `<span class="win">${name} Wins 🎉</span>`;
+    }
+
+    function updateTurnIndicator() {
+      if (!winner) {
+        turnIndicator.textContent = `${xIsNext ? playerX : playerO}'s Turn`;
+      } else {
+        turnIndicator.textContent = '';
+      }
+    }
+
+    function resetGame() {
+      board = Array(9).fill(null);
+      xIsNext = true;
+      winner = null;
+      winningCombination = [];
+      statusElement.textContent = '';
+      createBoard();
+    }
+
+    function popConfetti() {
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = `${Math.random() * window.innerWidth}px`;
+        confetti.style.top = `-20px`;
+        confetti.style.setProperty('--hue', Math.floor(Math.random() * 360));
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 2000);
+      }
+    }
+  </script>
+</body>
+</html>
