@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mega Pro 3D Drum Kit 🥁</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #fff;
+}
+h1 {
+  margin-bottom: 20px;
+  color: #f0db4f;
+}
+.drum-kit {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  perspective: 1000px;
+}
+.drum {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ccc, #888);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #000;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  position: relative;
+  user-select: none;
+}
+.drum::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  top: 0; left: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent);
+}
+.drum:hover {
+  transform: translateY(-5px) scale(1.05);
+}
+.drum:active {
+  transform: scale(0.95) translateY(2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 -2px 5px rgba(0,0,0,0.3);
+}
+.flash {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  top:0; left:0;
+  background: rgba(255,255,255,0.3);
+  pointer-events: none;
+  animation: flash 0.15s ease-out;
+}
+@keyframes flash {
+  0% {opacity:1; transform: scale(1);}
+  100% {opacity:0; transform: scale(1.5);}
+}
+.controls {
+  margin-top: 20px;
+}
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background: #f0db4f;
+  color: #111;
+  font-weight: bold;
+  transition: 0.2s;
+}
+button:hover {background: #ffc107;}
+p{margin-top:10px;color:#ccc;text-align:center;}
+</style>
+</head>
+<body>
+
+<h1>Mega Pro 3D Drum Kit 🥁</h1>
+<div class="drum-kit">
+  <div class="drum" data-drum="kick">Kick (A)</div>
+  <div class="drum" data-drum="snare">Snare (S)</div>
+  <div class="drum" data-drum="hihat">Hi-Hat (D)</div>
+  <div class="drum" data-drum="tom1">Tom1 (F)</div>
+  <div class="drum" data-drum="tom2">Tom2 (G)</div>
+  <div class="drum" data-drum="tom3">Tom3 (H)</div>
+  <div class="drum" data-drum="crash">Crash (J)</div>
+</div>
+
+<div class="controls">
+  <button id="startRecord">Start Recording</button>
+  <button id="stopRecord">Stop Recording</button>
+  <button id="playRecord">Play Recording</button>
+</div>
+
+<p>Use keyboard (A,S,D,F,G,H,J) or click drums to play!</p>
+
+<script>
+// Web Audio API
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const ctx = new AudioContext();
+
+// Recording storage
+let recording = [];
+let isRecording = false;
+
+// Drum sound functions
+function playKick(){playOsc('sine',150,0.5,0.5);}
+function playSnare(){playNoise(0.2);}
+function playHiHat(){playHiHatSound();}
+function playTom(freq=200){playOsc('sine',freq,0.5,0.5);}
+function playCrash(){playNoise(0.3);}
+
+// Generic oscillator for kick/toms
+function playOsc(type,freq,volume,duration){
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(freq*0.5, ctx.currentTime + duration);
+  gain.gain.setValueAtTime(volume, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+  osc.start();
+  osc.stop(ctx.currentTime + duration);
+}
+
+// Noise for snare/crash
+function playNoise(duration){
+  const bufferSize = ctx.sampleRate*duration;
+  const buffer = ctx.createBuffer(1,bufferSize,ctx.sampleRate);
+  const output = buffer.getChannelData(0);
+  for(let i=0;i<bufferSize;i++){
+    output[i]=(Math.random()*2-1)*Math.exp(-i/bufferSize);
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(1, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime+duration);
+  noise.connect(gain).connect(ctx.destination);
+  noise.start();
+}
+
+// Hi-Hat
+function playHiHatSound(){
+  const fundamental = 40;
+  const ratios = [1,1.5,2.08,3.16,4.16,5.42,6.92];
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.5, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime+0.05);
+  ratios.forEach(r=>{
+    const osc = ctx.createOscillator();
+    osc.type = 'square';
+    osc.frequency.value = fundamental*r;
+    osc.connect(gain);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime+0.05);
+  });
+  gain.connect(ctx.destination);
+}
+
+// Drum map
+const drumMap = {
+  kick: playKick,
+  snare: playSnare,
+  hihat: playHiHat,
+  tom1: ()=>playTom(200),
+  tom2: ()=>playTom(250),
+  tom3: ()=>playTom(300),
+  crash: playCrash
+};
+
+// Animate drum flash
+function flashDrum(drumEl){
+  const flash = document.createElement('div');
+  flash.className='flash';
+  drumEl.appendChild(flash);
+  setTimeout(()=>flash.remove(),150);
+}
+
+// Play drum and record
+function triggerDrum(drumName){
+  const drumEl = [...document.querySelectorAll(".drum")].find(d=>d.dataset.drum===drumName);
+  drumMap[drumName]();
+  flashDrum(drumEl);
+  if(isRecording){
+    recording.push({drum:drumName,time:Date.now()});
+  }
+}
+
+// Click events
+document.querySelectorAll(".drum").forEach(drum=>{
+  drum.addEventListener("click", ()=>{
+    triggerDrum(drum.dataset.drum);
+  });
+});
+
+// Keyboard
+const keyMap = {'a':'kick','s':'snare','d':'hihat','f':'tom1','g':'tom2','h':'tom3','j':'crash'};
+document.addEventListener("keydown",(e)=>{
+  const drumName = keyMap[e.key.toLowerCase()];
+  if(drumName) triggerDrum(drumName);
+});
+
+// Recording buttons
+document.getElementById('startRecord').addEventListener('click',()=>{
+  recording=[];
+  isRecording=true;
+  alert('Recording started!');
+});
+document.getElementById('stopRecord').addEventListener('click',()=>{
+  isRecording=false;
+  alert('Recording stopped!');
+});
+document.getElementById('playRecord').addEventListener('click',()=>{
+  if(recording.length===0) return alert('No recording found');
+  const startTime = recording[0].time;
+  recording.forEach(r=>{
+    setTimeout(()=>triggerDrum(r.drum),r.time-startTime);
+  });
+});
+</script>
+
+</body>
+</html>
