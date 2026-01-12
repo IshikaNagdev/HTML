@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code-Generated Piano 🎹</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background:#2b2b2b;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  margin:0;
+}
+h1{margin-bottom:20px;color:#f0db4f;}
+.piano{display:flex;position:relative;user-select:none;}
+.key{
+  width:60px;
+  height:250px;
+  border:1px solid #000;
+  background:white;
+  border-radius:0 0 5px 5px;
+  margin:0 1px;
+  cursor:pointer;
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  font-weight:bold;
+  color:#000;
+  box-shadow:0 5px 3px rgba(0,0,0,0.2);
+  transition: all 0.1s;
+}
+.key.black{
+  width:40px;
+  height:150px;
+  background:#111;
+  color:#fff;
+  position:absolute;
+  top:0;
+  z-index:2;
+  margin:0 -20px;
+  border-radius:0 0 3px 3px;
+  box-shadow:0 4px 3px rgba(0,0,0,0.5);
+}
+.key:hover{filter: brightness(1.2);}
+.key:active{transform: scale(0.97);}
+p{margin-top:20px;color:#ccc;}
+</style>
+</head>
+<body>
+
+<h1>Code-Generated Piano 🎹</h1>
+<div class="piano">
+  <!-- White keys -->
+  <div class="key" data-note="C">C</div>
+  <div class="key" data-note="D">D</div>
+  <div class="key" data-note="E">E</div>
+  <div class="key" data-note="F">F</div>
+  <div class="key" data-note="G">G</div>
+  <div class="key" data-note="A">A</div>
+  <div class="key" data-note="B">B</div>
+
+  <!-- Black keys -->
+  <div class="key black" data-note="C#" style="left:45px;">C#</div>
+  <div class="key black" data-note="D#" style="left:105px;">D#</div>
+  <div class="key black" data-note="F#" style="left:225px;">F#</div>
+  <div class="key black" data-note="G#" style="left:285px;">G#</div>
+  <div class="key black" data-note="A#" style="left:345px;">A#</div>
+</div>
+
+<p>Keyboard keys: Z,X,C,V,B,N,M (white), S,D,G,H,J (black)</p>
+
+<script>
+// Web Audio API
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const ctx = new AudioContext();
+
+// Note frequencies (C4 octave)
+const frequencies = {
+  "C":261.63,
+  "C#":277.18,
+  "D":293.66,
+  "D#":311.13,
+  "E":329.63,
+  "F":349.23,
+  "F#":369.99,
+  "G":392.00,
+  "G#":415.30,
+  "A":440.00,
+  "A#":466.16,
+  "B":493.88
+};
+
+// Play code-generated note with envelope
+function playNote(note){
+  const osc = ctx.createOscillator();
+  const gainNode = ctx.createGain();
+  osc.connect(gainNode);
+  gainNode.connect(ctx.destination);
+  osc.type = "sine"; // try "triangle" or "square" for variation
+  osc.frequency.value = frequencies[note];
+
+  // Simple attack/decay envelope for nicer piano-like tone
+  const now = ctx.currentTime;
+  gainNode.gain.setValueAtTime(0, now);
+  gainNode.gain.linearRampToValueAtTime(0.3, now + 0.02); // attack
+  gainNode.gain.linearRampToValueAtTime(0, now + 0.5); // decay
+
+  osc.start(now);
+  osc.stop(now + 0.5);
+}
+
+// Click event
+document.querySelectorAll(".key").forEach(key=>{
+  key.addEventListener("click", ()=>{
+    playNote(key.dataset.note);
+  });
+});
+
+// Keyboard support
+const keyMap = {
+  'z':"C",
+  's':"C#",
+  'x':"D",
+  'd':"D#",
+  'c':"E",
+  'v':"F",
+  'g':"F#",
+  'b':"G",
+  'h':"G#",
+  'n':"A",
+  'j':"A#",
+  'm':"B"
+};
+
+document.addEventListener("keydown",(e)=>{
+  const note = keyMap[e.key.toLowerCase()];
+  if(note){
+    playNote(note);
+    const keyEl = [...document.querySelectorAll(".key")].find(k=>k.dataset.note===note);
+    if(keyEl){
+      keyEl.style.transform="scale(0.97)";
+      setTimeout(()=>{keyEl.style.transform="scale(1)";},100);
+    }
+  }
+});
+</script>
+
+</body>
+</html>
