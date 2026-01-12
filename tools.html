@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Multi-Tool Hub 🌐</title>
+<meta name="description" content="All-in-one Multi-Tool Web App: CGPA, EMI, BMI, Expense Tracker, and more!">
+<meta name="keywords" content="CGPA, EMI, BMI, Finance, Health, Productivity, Calculator, Tools">
+<meta name="author" content="Ishika Nagdev">
+<link rel="icon" href="favicon.ico">
+
+<!-- Font Awesome for icons -->
+<script src="https://kit.fontawesome.com/a81368914c.js" crossorigin="anonymous"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* ----------------- RESET & GLOBAL ----------------- */
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Arial', sans-serif;}
+body { transition: background 0.3s, color 0.3s; background:#f5f5f5; color:#333;}
+a { text-decoration:none; color:inherit;}
+h2 { margin-bottom:20px; font-size:28px; text-align:center;}
+section { padding:50px 20px; }
+section:nth-child(even) { background:#ecf0f1; }
+section h2 { margin-bottom:40px; }
+
+/* ----------------- NAVBAR ----------------- */
+nav {
+  background: linear-gradient(90deg,#2c3e50,#3498db);
+  padding:15px 30px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:1000; color:white;
+}
+nav .logo { font-weight:bold; font-size:22px; letter-spacing:1px; }
+nav ul { list-style:none; display:flex; gap:20px; }
+nav ul li a { color:white; font-weight:500; padding:5px 10px; border-radius:5px; transition:0.3s; }
+nav ul li a:hover { background:rgba(255,255,255,0.2); }
+#darkModeToggle { cursor:pointer; background:none; border:2px solid white; color:white; border-radius:5px; padding:5px 10px; transition:0.3s;}
+#darkModeToggle:hover { background:white; color:#3498db; }
+
+/* ----------------- TOOL CARDS ----------------- */
+.tool { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); max-width:500px; margin:20px auto; transition:0.3s; position:relative; }
+.tool:hover { box-shadow:0 8px 20px rgba(0,0,0,0.2); transform:translateY(-5px);}
+.tool h3 { margin-bottom:15px; color:#3498db; display:flex; align-items:center; gap:8px;}
+.tool label { display:block; margin:8px 0 4px; font-weight:500; }
+.tool input, .tool textarea, .tool button, .tool select { width:100%; margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc; font-size:16px; }
+.tool button { background:#3498db; color:white; font-weight:bold; border:none; cursor:pointer; transition:0.3s; }
+.tool button:hover { background:#2980b9; }
+.tool h4 { margin-top:10px; background:#f0f3f7; padding:10px; border-radius:5px; }
+
+/* ----------------- RESPONSIVE ----------------- */
+@media(max-width:768px){ nav ul{ flex-direction:column; gap:10px; margin-top:10px;} }
+
+/* ----------------- DARK MODE ----------------- */
+body.dark { background:#121212; color:#f5f5f5; }
+body.dark .tool { background:#1e1e1e; box-shadow:0 4px 10px rgba(255,255,255,0.05); }
+body.dark .tool h4 { background:#2a2a2a; }
+body.dark nav { background: linear-gradient(90deg, #0f2027, #2c5364);}
+body.dark nav ul li a { color:#f5f5f5;}
+body.dark #darkModeToggle { border:2px solid #f5f5f5; color:#f5f5f5;}
+</style>
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav>
+  <div class="logo">Ultimate ToolBox 🌐</div>
+  <ul>
+    <li><a href="#academic">Academic</a></li>
+    <li><a href="#finance">Finance</a></li>
+    <li><a href="#health">Health</a></li>
+    <li><a href="#math">Math & Logic</a></li>
+    <li><a href="#productivity">Productivity</a></li>
+    <li><a href="#utility">Utility</a></li>
+    <li><a href="#fun">Fun</a></li>
+  </ul>
+  <button id="darkModeToggle">🌙 Dark Mode</button>
+</nav>
+
+<!-- ==================== ACADEMIC ==================== -->
+<section id="academic">
+<h2>Academic Tools</h2>
+
+<div class="tool">
+<h3><i class="fas fa-graduation-cap"></i> CGPA Calculator</h3>
+<label>Semester 1:</label><input type="number" id="s1" step="0.01">
+<label>Semester 2:</label><input type="number" id="s2" step="0.01">
+<label>Semester 3:</label><input type="number" id="s3" step="0.01">
+<button onclick="calculateCGPA()">Calculate CGPA</button>
+<h4 id="cgpaResult">Your CGPA: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-percentage"></i> Percentage ↔ CGPA Converter</h3>
+<label>Enter CGPA:</label><input type="number" id="cgpaInput" step="0.01">
+<button onclick="cgpaToPercentage()">Convert to %</button>
+<h4 id="percentResult">Percentage: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-birthday-cake"></i> Age Calculator</h3>
+<label>Date of Birth:</label><input type="date" id="dob">
+<button onclick="calculateAge()">Calculate Age</button>
+<h4 id="ageResult">Age: --</h4>
+</div>
+
+</section>
+
+<!-- ==================== FINANCE ==================== -->
+<section id="finance">
+<h2>Finance Tools</h2>
+
+<div class="tool">
+<h3><i class="fas fa-coins"></i> EMI Calculator</h3>
+<label>Loan Amount:</label><input type="number" id="loan">
+<label>Rate (% per annum):</label><input type="number" id="rate">
+<label>Tenure (months):</label><input type="number" id="tenure">
+<button onclick="calculateEMI()">Calculate EMI</button>
+<h4 id="emiResult">EMI: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-chart-line"></i> SIP Calculator</h3>
+<label>Monthly Investment:</label><input type="number" id="sipAmount">
+<label>Rate of Return (% per annum):</label><input type="number" id="sipRate">
+<label>Time (years):</label><input type="number" id="sipTime">
+<button onclick="calculateSIP()">Calculate Future Value</button>
+<h4 id="sipResult">Future Value: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-calculator"></i> Compound Interest Calculator</h3>
+<label>Principal:</label><input type="number" id="ciPrincipal">
+<label>Rate (% per annum):</label><input type="number" id="ciRate">
+<label>Time (years):</label><input type="number" id="ciTime">
+<button onclick="compoundInterest()">Calculate</button>
+<h4 id="ciResult">Future Value: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-wallet"></i> Currency Converter (INR → USD)</h3>
+<label>Amount in INR:</label><input type="number" id="inr">
+<button onclick="convertCurrency()">Convert</button>
+<h4 id="currencyResult">USD: --</h4>
+</div>
+
+</section>
+
+<!-- ==================== HEALTH ==================== -->
+<section id="health">
+<h2>Health Tools</h2>
+
+<div class="tool">
+<h3><i class="fas fa-heart"></i> BMI Calculator</h3>
+<label>Weight (kg):</label><input type="number" id="weight">
+<label>Height (cm):</label><input type="number" id="height">
+<button onclick="calculateBMI()">Calculate BMI</button>
+<h4 id="bmiResult">BMI: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-ruler-vertical"></i> Ideal Weight Calculator</h3>
+<label>Height (cm):</label><input type="number" id="idealHeight">
+<button onclick="idealWeight()">Calculate</button>
+<h4 id="idealWeightResult">Weight: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-fire"></i> Daily Calorie Requirement</h3>
+<label>Weight (kg):</label><input type="number" id="calWeight">
+<label>Height (cm):</label><input type="number" id="calHeight">
+<label>Age:</label><input type="number" id="calAge">
+<button onclick="dailyCalories()">Calculate</button>
+<h4 id="calResult">Calories: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-tint"></i> Water Intake Calculator</h3>
+<label>Weight (kg):</label><input type="number" id="waterWeight">
+<button onclick="waterIntake()">Calculate</button>
+<h4 id="waterResult">Water: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-chart-line"></i> BMI Trend Graph</h3>
+<canvas id="bmiChart" width="400" height="200"></canvas>
+<button onclick="addBMIDataset()">Add BMI to Chart</button>
+</div>
+
+</section>
+
+<!-- ==================== MATH & LOGIC ==================== -->
+<section id="math">
+<h2>Math & Logic Tools</h2>
+
+<div class="tool">
+<h3><i class="fas fa-superscript"></i> Factorial Calculator</h3>
+<label>Number:</label><input type="number" id="factorialInput">
+<button onclick="calculateFactorial()">Calculate Factorial</button>
+<h4 id="factorialResult">Result: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-times"></i> LCM & HCF Calculator</h3>
+<label>Number 1:</label><input type="number" id="num1">
+<label>Number 2:</label><input type="number" id="num2">
+<button onclick="calculateLCMHCF()">Calculate</button>
+<h4 id="lcmhcfResult">LCM & HCF: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-random"></i> Random Number Generator</h3>
+<label>Min:</label><input type="number" id="randMin">
+<label>Max:</label><input type="number" id="randMax">
+<button onclick="randomNumber()">Generate</button>
+<h4 id="randResult">Result: --</h4>
+</div>
+
+</section>
+
+<!-- ==================== PRODUCTIVITY ==================== -->
+<section id="productivity">
+<h2>Productivity Tools</h2>
+
+<div class="tool">
+<h3><i class="fas fa-clock"></i> Pomodoro Timer</h3>
+<label>Minutes:</label><input type="number" id="pomodoroTime">
+<button onclick="startPomodoro()">Start Timer</button>
+<h4 id="pomodoroResult">Time left: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-list"></i> To-Do List</h3>
+<label>Task:</label><input type="text" id="todoTask">
+<button onclick="addTodo()">Add Task</button>
+<ul id="todoList"></ul>
+</div>
+
+</section>
+
+<!-- ==================== FUN ==================== -->
+<section id="fun">
+<h2>Fun & Random Tools</h2>
+
+<div class="tool">
+<h3><i class="fas fa-dice"></i> Dice Roller</h3>
+<button onclick="rollDice()">Roll Dice 🎲</button>
+<h4 id="diceResult">Result: --</h4>
+</div>
+
+<div class="tool">
+<h3><i class="fas fa-coins"></i> Coin Flip</h3>
+<button onclick="flipCoin()">Flip Coin 🪙</button>
+<h4 id="coinResult">Result: --</h4>
+</div>
+
+</section>
+
+<script>
+// ==================== DARK MODE ====================
+const toggle = document.getElementById("darkModeToggle");
+toggle.addEventListener("click",()=>{
+  document.body.classList.toggle("dark");
+  toggle.innerText=document.body.classList.contains("dark")?"☀ Light Mode":"🌙 Dark Mode";
+});
+
+// ==================== ACADEMIC ====================
+function calculateCGPA(){ let s1=+document.getElementById("s1").value||0; let s2=+document.getElementById("s2").value||0; let s3=+document.getElementById("s3").value||0; document.getElementById("cgpaResult").innerText="Your CGPA: "+((s1+s2+s3)/3).toFixed(2); }
+function cgpaToPercentage(){ let cgpa=+document.getElementById("cgpaInput").value||0; document.getElementById("percentResult").innerText="Percentage: "+(cgpa*9.5).toFixed(2)+"%"; }
+function calculateAge(){ let dob=new Date(document.getElementById("dob").value); let diff=new Date()-dob; let age=Math.floor(diff/(1000*60*60*24*365)); document.getElementById("ageResult").innerText="Age: "+age+" years"; }
+
+// ==================== FINANCE ====================
+function calculateEMI(){ let P=+document.getElementById("loan").value||0; let R=+document.getElementById("rate").value/12/100||0; let N=+document.getElementById("tenure").value||1; let emi=(P*R*Math.pow(1+R,N)/(Math.pow(1+R,N)-1)).toFixed(2); document.getElementById("emiResult").innerText="EMI: "+emi; }
+function calculateSIP(){ let p=+document.getElementById("sipAmount").value||0; let r=+document.getElementById("sipRate").value/100||0; let t=+document.getElementById("sipTime").value||0; let fv=(p*((Math.pow(1+r/12, t*12)-1)/(r/12))).toFixed(2); document.getElementById("sipResult").innerText="Future Value: "+fv; }
+function compoundInterest(){ let P=+document.getElementById("ciPrincipal").value||0; let r=+document.getElementById("ciRate").value/100||0; let t=+document.getElementById("ciTime").value||1; let A=(P*Math.pow(1+r,t)).toFixed(2); document.getElementById("ciResult").innerText="Future Value: "+A; }
+function convertCurrency(){ let inr=+document.getElementById("inr").value||0; let usd=(inr*0.012).toFixed(2); document.getElementById("currencyResult").innerText="USD: "+usd; }
+
+// ==================== HEALTH ====================
+let bmiHistory=[]; 
+function calculateBMI(){ let w=+document.getElementById("weight").value||0; let h=+document.getElementById("height").value/100||1; let bmi=(w/(h*h)).toFixed(2); let cat=bmi<18.5?"Underweight":bmi<25?"Normal":bmi<30?"Overweight":"Obese"; bmiHistory.push(bmi); document.getElementById("bmiResult").innerText=`BMI: ${bmi} (${cat})`; }
+function idealWeight(){ let h=+document.getElementById("idealHeight").value||0; let iw=((h-100)-((h-150)/2)).toFixed(1); document.getElementById("idealWeightResult").innerText=iw+" kg"; }
+function dailyCalories(){ let w=+document.getElementById("calWeight").value||0; let h=+document.getElementById("calHeight").value||0; let age=+document.getElementById("calAge").value||0; let cal=(10*w+6.25*h-5*age+5).toFixed(0); document.getElementById("calResult").innerText=cal+" kcal"; }
+function waterIntake(){ let w=+document.getElementById("waterWeight").value||0; document.getElementById("waterResult").innerText=(w*0.033).toFixed(2)+" litres"; }
+
+// BMI Chart
+const ctx=document.getElementById('bmiChart').getContext('2d');
+const bmiChart=new Chart(ctx,{type:'line',data:{labels:[],datasets:[{label:'BMI Trend',data:[],borderColor:'#3498db',fill:false}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
+function addBMIDataset(){ if(bmiHistory.length>0){ bmiChart.data.labels.push('BMI '+bmiChart.data.labels.length+1); bmiChart.data.datasets[0].data.push(bmiHistory[bmiHistory.length-1]); bmiChart.update(); }}
+
+// ==================== MATH & LOGIC ====================
+function calculateFactorial(){ let n=+document.getElementById("factorialInput").value||0; let f=1; for(let i=1;i<=n;i++){ f*=i; } document.getElementById("factorialResult").innerText=f; }
+function calculateLCMHCF(){ let a=+document.getElementById("num1").value||0; let b=+document.getElementById("num2").value||0; let hcf=(x,y)=>!y?x:hcf(y,x%y); let H=hcf(a,b); let L=(a*b)/H; document.getElementById("lcmhcfResult").innerText="HCF: "+H+", LCM: "+L; }
+function randomNumber(){ let min=+document.getElementById("randMin").value||0; let max=+document.getElementById("randMax").value||0; document.getElementById("randResult").innerText=Math.floor(Math.random()*(max-min+1)+min); }
+
+// ==================== PRODUCTIVITY ====================
+function startPomodoro(){ let t=+document.getElementById("pomodoroTime").value||0; let el=document.getElementById("pomodoroResult"); el.innerText="Time left: "+t+" min"; let timer=setInterval(()=>{ t--; el.innerText="Time left: "+t+" min"; if(t<=0) clearInterval(timer); },60000);}
+let todoListArr=[]; function addTodo(){ let task=document.getElementById("todoTask").value; if(task){ todoListArr.push(task); localStorage.setItem("todoList",JSON.stringify(todoListArr)); renderTodo(); document.getElementById("todoTask").value=""; } }
+function renderTodo(){ let ul=document.getElementById("todoList"); ul.innerHTML=""; todoListArr.forEach((t,i)=>{ let li=document.createElement("li"); li.innerText=t; ul.appendChild(li);}); }
+window.onload=()=>{ let saved=JSON.parse(localStorage.getItem("todoList")||"[]"); todoListArr=saved; renderTodo(); }
+
+// ==================== FUN ====================
+function rollDice(){ let res=Math.floor(Math.random()*6)+1; document.getElementById("diceResult").innerText="Result: "+res; }
+function flipCoin(){ let res=Math.random()<0.5?"Heads":"Tails"; document.getElementById("coinResult").innerText="Result: "+res; }
+
+</script>
+
+</body>
+</html>
